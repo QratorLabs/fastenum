@@ -5,7 +5,7 @@ with open('README.md', 'r', encoding='utf-8') as fd:
 
 setuptools.setup(
     name='FastEnum',
-    version='1.0.0',
+    version='1.1.0',
     license='BSD 3-clause',
     platforms=['any'],
     author='Andrey Semenov',

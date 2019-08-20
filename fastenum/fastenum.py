@@ -13,10 +13,17 @@ class FastEnum(type):
     def __new__(mcs, name, bases, namespace: Dict[Text, Any]):
         attributes: List[Text] = [k for k in namespace.keys()
                                   if (not k.startswith('_') and k.isupper())]
-        if not attributes:
-            attributes = [k for k, v in namespace.get('__annotations__', {}).items()
-                          if (not k.startswith('_') and k.isupper() and v == name)]
-            namespace.update(zip(attributes, range(1, len(attributes) + 1)))
+        attributes += [k for k, v in namespace.get('__annotations__', {}).items()
+                       if (not k.startswith('_') and k.isupper() and v == name)]
+        zero_valued = bool(namespace.get('_ZERO_VALUED'))
+        light_val = 0 + int(not zero_valued)
+        for attr in attributes:
+            if attr in namespace:
+                continue
+            else:
+                namespace[attr] = light_val
+                light_val += 1
+
         __slots__ = set(namespace.get('__slots__', tuple()))
         __slots__.update({'name', 'value', '_value_to_instance_map'})
         namespace['__slots__'] = tuple(__slots__)
@@ -35,13 +42,23 @@ class FastEnum(type):
                 val = namespace[s]
                 if not isinstance(val, tuple):
                     val = (val,)
-                inst = typ(*val, name=s)
+                if val[0] in typ._value_to_instance_map:
+                    inst = typ._value_to_instance_map[val[0]]
+                else:
+                    inst = typ(*val, name=s)
+                    typ._value_to_instance_map[inst.value] = inst
                 setattr(typ, s, inst)
-                typ._value_to_instance_map[inst.value] = inst
 
             # noinspection PyUnresolvedReferences
             typ.__call__ = typ.__new__ = typ.get
             del typ.__init__
+
+            if f'_{name}__init_late' in namespace:
+                fun = namespace[f'_{name}__init_late']
+                for v in typ._value_to_instance_map.values():
+                    fun(v)
+                delattr(typ, f'_{name}__init_late')
+
             typ.__setattr__ = typ.__delattr__ = mcs.__restrict_modification
             typ.__hash__ = mcs.__hash
             typ.__eq__ = mcs.eq
@@ -93,6 +110,7 @@ class FastEnum(type):
     def __getitem__(self, item):
         return getattr(self, item)
 
+    # noinspection PyUnusedLocal,SpellCheckingInspection
     def __deepcopy(cls, memodict=None):
         return cls
 

@@ -36,6 +36,7 @@ class LightEnum(metaclass=FastEnum):
  When this form is used it is strictly required that members are "type-hinted"
  as instances of the enum class. Otherwise they will remain just as property/attributes
  annotations deep inside the `cls.__annotations__`
+
 - an enum could be accessed by value
 ```python
 # >>> LightEnum(1)
@@ -46,6 +47,59 @@ class LightEnum(metaclass=FastEnum):
 # >>> LightEnum['ONE']
 # <LightEnum.ONE: 1>
 ```
+
+- it is possible to mix lightweight declaration and a value-provided one in the same class:
+```python
+class MixedEnum(metaclass=FastEnum):
+    _ZERO_VALUED = 1
+    AUTO_ZERO: 'MixedEnum'
+    ONE: 'MixedEnum' = 1
+    AUTO_ONE: 'MixedEnum'
+    TWO: 'MixedEnum' = 2
+
+# >>> MixedEnum(1)
+# <MixedEnum.ONE: 1>
+# >>> MixedEnum.AUTO_ZERO
+# <MixedEnum.AUTO_ZERO: 0>
+# >>> MixedEnum.AUTO_ONE
+# <MixedEnum.ONE: 1>
+```
+ When this form is used, if there are more than one Enum with the same value as a result (`MixedEnum.AUTO_ONE.value`
+ and `MixedEnum.ONE.value` in this example) all subsequent enums are renrered as just aliases to the first declared
+ (the order of declaration is: first value-provided enums then lightweight forms so auto-valued will allways become
+ aliases, not vice versa). The auto-valued enums value provider is independent from value-provided ones.
+
+- as shown in the previous example, a special attribute `_ZERO_VALUED` could be provided in class declaration;
+ given it's value renders to `True` in boolean context auto-valued enums will start from zero instead of integer 1;
+ The `_ZERO_VALUED` attribute is erased from the resulting enum type 
+
+- an enum creation can be hooked with 'late-init'. If a special method `def __init_late(self): ...` is provided within
+ enum class' declaration, it's run for every enum instance created after all of them are created successfully
+```python
+class HookedEnum(metaclass=FastEnum):
+    halved_value: 'HookedEnum'
+
+    __slots__ = ('halved_value',)
+
+    def __init_late(self):
+        # noinspection PyTypeChecker
+        self.halved_value: 'HookedEnum' = self.__class__(self.value // 2)
+
+    ZERO: 'HookedEnum' = 0
+    ONE: 'HookedEnum' = 1
+    TWO: 'HookedEnum' = 2
+    THREE: 'HookedEnum' = 3
+
+#>>> HookedEnum.ZERO.halved_value
+#<HookedEnum.ZERO: 0>
+#>>> HookedEnum.ONE.halved_value
+#<HookedEnum.ZERO: 0>
+#>>> HookedEnum.TWO.halved_value
+#<HookedEnum.ONE: 1>
+#>>> HookedEnum.THREE.halved_value
+#<HookedEnum.ONE: 1>
+```
+
 - enums are singletons
 ```python
 from pickle import dumps, loads

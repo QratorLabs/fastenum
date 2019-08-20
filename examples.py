@@ -48,7 +48,9 @@ class ExtendedEnum(metaclass=FastEnum):
     __slots__ = ('description',)
 
     def __init__(self, value, description, name):
+        # noinspection PyDunderSlots,PyUnresolvedReferences
         self.value = value
+        # noinspection PyDunderSlots,PyUnresolvedReferences
         self.name = name
         self.description = description
 
@@ -97,7 +99,9 @@ class ExtEnumBase(metaclass=FastEnum):
     __slots__ = ('description',)
 
     def __init__(self, value, description, name):
+        # noinspection PyDunderSlots,PyUnresolvedReferences
         self.value = value
+        # noinspection PyDunderSlots,PyUnresolvedReferences
         self.name = name
         self.description = description
 
@@ -110,3 +114,42 @@ class ExtEnumOne(ExtEnumBase):
 class ExtEnumTwo(ExtEnumBase):
     RED = 'red', 'A sunset'
     GREEN = 'green', 'Allows to cross the road'
+
+
+class MixedEnum(metaclass=FastEnum):
+    _ZERO_VALUED = 1
+    AUTO_ZERO: 'MixedEnum'
+    ONE: 'MixedEnum' = 1
+    AUTO_ONE: 'MixedEnum'
+    TWO: 'MixedEnum' = 2
+
+# >>> MixedEnum(1)
+# <MixedEnum.ONE: 1>
+# >>> MixedEnum.AUTO_ZERO
+# <MixedEnum.AUTO_ZERO: 0>
+# >>> MixedEnum.AUTO_ONE
+# <MixedEnum.ONE: 1>
+
+
+class HookedEnum(metaclass=FastEnum):
+    halved_value: 'HookedEnum'
+
+    __slots__ = ('halved_value',)
+
+    def __init_late(self):
+        # noinspection PyTypeChecker
+        self.halved_value: 'HookedEnum' = self.__class__(self.value // 2)
+
+    ZERO: 'HookedEnum' = 0
+    ONE: 'HookedEnum' = 1
+    TWO: 'HookedEnum' = 2
+    THREE: 'HookedEnum' = 3
+
+# >>> HookedEnum.ZERO.halved_value
+# <HookedEnum.ZERO: 0>
+# >>> HookedEnum.ONE.halved_value
+# <HookedEnum.ZERO: 0>
+# >>> HookedEnum.TWO.halved_value
+# <HookedEnum.ONE: 1>
+# >>> HookedEnum.THREE.halved_value
+# <HookedEnum.ONE: 1>
