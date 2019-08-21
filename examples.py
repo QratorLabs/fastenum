@@ -1,6 +1,6 @@
 from typing import Text
 
-from fastenum import FastEnum
+from fastenum_meta import FastEnum
 
 
 class LightEnum(metaclass=FastEnum):
@@ -117,7 +117,7 @@ class ExtEnumTwo(ExtEnumBase):
 
 
 class MixedEnum(metaclass=FastEnum):
-    _ZERO_VALUED = 1
+    _ZERO_VALUED = True
     AUTO_ZERO: 'MixedEnum'
     ONE: 'MixedEnum' = 1
     AUTO_ONE: 'MixedEnum'
