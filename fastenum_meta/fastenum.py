@@ -78,14 +78,6 @@ class FastEnum(type):
             # noinspection PyUnresolvedReferences
             typ.__call__ = typ.__new__ = typ.get
             del typ.__init__
-
-            if f'_{name}__init_late' in namespace:
-                fun = namespace[f'_{name}__init_late']
-                for instance in typ._value_to_instance_map.values():
-                    fun(instance)
-                delattr(typ, f'_{name}__init_late')
-
-            typ.__setattr__ = typ.__delattr__ = mcs.__restrict_modification
             typ.__hash__ = mcs.__hash
             typ.__eq__ = mcs.__eq
             typ.__copy__ = mcs.__copy
@@ -95,7 +87,15 @@ class FastEnum(type):
                 typ.__str__ = mcs.__str
             if '__repr__' not in namespace:
                 typ.__repr__ = mcs.__repr
+
+            if f'_{name}__init_late' in namespace:
+                fun = namespace[f'_{name}__init_late']
+                for instance in typ._value_to_instance_map.values():
+                    fun(instance)
+                delattr(typ, f'_{name}__init_late')
+
             typ._finalized = True
+            typ.__setattr__ = typ.__delattr__ = mcs.__restrict_modification
         return typ
 
     @staticmethod
