@@ -7,8 +7,8 @@ The main objective to using standard library's Enum is that it's super slow.
 
 Features implemented:
 - as in stdlib's enums all Enum members are instances of the Enum itself
-```
-# >>> type(LightEnum.ONE)
+```python
+type(LightEnum.ONE)
 # <class 'LightEnum'>
 ```
 - all enum members have at least `name` and `value` properties; the `name` property
@@ -19,11 +19,12 @@ class ValuesGivenEnum(metaclass=FastEnum):
     ONE: 'ValuesGivenEnum' = 1
     FOUR: 'ValuesGivenEnum' = 4
     ELEVEN: 'ValuesGivenEnum' = 11
-# >>> ValuesGivenEnum.FOUR
+
+ValuesGivenEnum.FOUR
 # <ValuesGivenEnum.FOUR: 4>
-# >>> ValuesGivenEnum.FOUR.value
+ValuesGivenEnum.FOUR.value
 # 4
-# >>> ValuesGivenEnum.FOUR.name
+ValuesGivenEnum.FOUR.name
 # 'FOUR'
 ```
 - a lightweight form of enum declaration is possible
@@ -39,12 +40,12 @@ class LightEnum(metaclass=FastEnum):
 
 - an enum could be accessed by value
 ```python
-# >>> LightEnum(1)
+LightEnum(1)
 # <LightEnum.ONE: 1>
 ```
 - or by name
 ```python
-# >>> LightEnum['ONE']
+LightEnum['ONE']
 # <LightEnum.ONE: 1>
 ```
 
@@ -57,16 +58,16 @@ class MixedEnum(metaclass=FastEnum):
     AUTO_ONE: 'MixedEnum'
     TWO: 'MixedEnum' = 2
 
-# >>> MixedEnum(1)
+MixedEnum(1)
 # <MixedEnum.ONE: 1>
-# >>> MixedEnum.AUTO_ZERO
+MixedEnum.AUTO_ZERO
 # <MixedEnum.AUTO_ZERO: 0>
-# >>> MixedEnum.AUTO_ONE
+MixedEnum.AUTO_ONE
 # <MixedEnum.ONE: 1>
 ```
  When this form is used, if there are more than one Enum with the same value as a result (`MixedEnum.AUTO_ONE.value`
- and `MixedEnum.ONE.value` in this example) all subsequent enums are renrered as just aliases to the first declared
- (the order of declaration is: first value-provided enums then lightweight forms so auto-valued will allways become
+ and `MixedEnum.ONE.value` in this example) all subsequent enums are rendered as just aliases to the first declared
+ (the order of declaration is: first value-provided enums then lightweight forms so auto-valued will always become
  aliases, not vice versa). The auto-valued enums value provider is independent from value-provided ones.
 
 - as shown in the previous example, a special attribute `_ZERO_VALUED` could be provided in class declaration;
@@ -90,13 +91,13 @@ class HookedEnum(metaclass=FastEnum):
     TWO: 'HookedEnum' = 2
     THREE: 'HookedEnum' = 3
 
-#>>> HookedEnum.ZERO.halved_value
+HookedEnum.ZERO.halved_value
 #<HookedEnum.ZERO: 0>
-#>>> HookedEnum.ONE.halved_value
+HookedEnum.ONE.halved_value
 #<HookedEnum.ZERO: 0>
-#>>> HookedEnum.TWO.halved_value
+HookedEnum.TWO.halved_value
 #<HookedEnum.ONE: 1>
-#>>> HookedEnum.THREE.halved_value
+HookedEnum.THREE.halved_value
 #<HookedEnum.ONE: 1>
 ```
 
@@ -114,9 +115,9 @@ o is r
 ```
 - enums are hashable
 ```python
-# >>> list(LightEnum)
+list(LightEnum)
 # [<LightEnum.ONE: 1>, <LightEnum.TWO: 2>, <LightEnum.THREE: 3>]
-# >>> set(LightEnum)
+set(LightEnum)
 # {<LightEnum.ONE: 1>, <LightEnum.TWO: 2>, <LightEnum.THREE: 3>}
 ```
 - enums are easily extended if one needs
@@ -135,17 +136,18 @@ class ExtendedEnum(metaclass=FastEnum):
 
     RED = 'red', 'a color of blood'
     GREEN = 'green', 'a color of grass in the spring'
-# >>> ExtendedEnum.GREEN
+
+ExtendedEnum.GREEN
 # <ExtendedEnum.GREEN: green>
-# >>> str(ExtendedEnum.GREEN)
+str(ExtendedEnum.GREEN)
 # 'ExtendedEnum.GREEN'
-# >>> ExtendedEnum.GREEN.name
+ExtendedEnum.GREEN.name
 # 'GREEN'
-# >>> ExtendedEnum.GREEN.value
+ExtendedEnum.GREEN.value
 # 'green'
-# >>> ExtendedEnum.GREEN.description
+ExtendedEnum.GREEN.description
 # 'a color of grass in the spring'
-# >>> ExtendedEnum.GREEN.describe()
+ExtendedEnum.GREEN.describe()
 # 'a color of grass in the spring'
 ```
  In case an enum has extended set of fields it it must be guaranteed that the `__init__`
@@ -155,43 +157,51 @@ class ExtendedEnum(metaclass=FastEnum):
  a tuple-like object it is wrapped into tuple beforehand)
 - protected from modifications
 ```python
->>> del LightEnum.ONE
-Traceback (most recent call last):
-  File "<stdin>", line 1, in <module>
-  File "fastenum.py", line 81, in __delattr__
-    self.__restrict_modification()
-  File "fastenum.py", line 69, in __restrict_modification
-    raise TypeError(f'Enum-like classes strictly prohibit changing any attribute/property after they are once set')
-TypeError: Enum-like classes strictly prohibit changing any attribute/property after they are once set
->>> del LightEnum.ONE.name
-Traceback (most recent call last):
-  File "<stdin>", line 1, in <module>
-  File "fastenum.py", line 69, in __restrict_modification
-    raise TypeError(f'Enum-like classes strictly prohibit changing any attribute/property after they are once set')
-TypeError: Enum-like classes strictly prohibit changing any attribute/property after they are once set
->>> ExtendedEnum.GREEN.description = "I've changed my mind, it's a colour of swamps"
-Traceback (most recent call last):
-  File "<stdin>", line 1, in <module>
-  File "fastenum.py", line 69, in __restrict_modification
-    raise TypeError(f'Enum-like classes strictly prohibit changing any attribute/property after they are once set')
-TypeError: Enum-like classes strictly prohibit changing any attribute/property after they are once set
+del LightEnum.ONE
+#Traceback (most recent call last):
+#  File "<stdin>", line 1, in <module>
+#  File "fastenum.py", line 81, in __delattr__
+#    self.__restrict_modification()
+#  File "fastenum.py", line 69, in __restrict_modification
+#    raise TypeError(f'Enum-like classes strictly prohibit changing any attribute/property after they are once set')
+#TypeError: Enum-like classes strictly prohibit changing any attribute/property after they are once set
+del LightEnum.ONE.name
+#Traceback (most recent call last):
+#  File "<stdin>", line 1, in <module>
+#  File "fastenum.py", line 69, in __restrict_modification
+#    raise TypeError(f'Enum-like classes strictly prohibit changing any attribute/property after they are once set')
+#TypeError: Enum-like classes strictly prohibit changing any attribute/property after they are once set
+ExtendedEnum.GREEN.description = "I've changed my mind, it's a colour of swamps"
+#Traceback (most recent call last):
+#  File "<stdin>", line 1, in <module>
+#  File "fastenum.py", line 69, in __restrict_modification
+#    raise TypeError(f'Enum-like classes strictly prohibit changing any attribute/property after they are once set')
+#TypeError: Enum-like classes strictly prohibit changing any attribute/property after they are once set
 ```
 - protected from subclassing
 ```python
->>> class LightAlias(LightEnum):
-...     pass
-...
-Traceback (most recent call last):
-  File "<stdin>", line 1, in <module>
-  File "fastenum.py", line 34, in __new__
-    typ.__call__ = typ.__new__ = typ.get
-  File "fastenum.py", line 76, in __setattr__
-    self.__restrict_modification()
-  File "fastenum.py", line 69, in __restrict_modification
-    raise TypeError(f'Enum-like classes strictly prohibit changing any attribute/property after they are once set')
-TypeError: Enum-like classes strictly prohibit changing any attribute/property after they are once set
+class LightSub(LightEnum):
+    FOUR: 'LightSub'
+
+#Traceback (most recent call last):
+#  File "<stdin>", line 1, in <module>
+#  File "fastenum.py", line 34, in __new__
+#    typ.__call__ = typ.__new__ = typ.get
+#  File "fastenum.py", line 76, in __setattr__
+#    self.__restrict_modification()
+#  File "fastenum.py", line 69, in __restrict_modification
+#    raise TypeError(f'Enum-like classes strictly prohibit changing any attribute/property after they are once set')
+#TypeError: Enum-like classes strictly prohibit changing any attribute/property after they are once set
 ```
-- but extensible in superclasses
+- but you could declare a class providing no new values (the result will be just an alias):
+```python
+class LightAlias(LightEnum):
+    pass
+
+LightAlias.ONE
+# <LightEnum.ONE: 1>
+```
+- and extensible in superclasses
 ```python
 class ExtEnumBase(metaclass=FastEnum):
     description: Text

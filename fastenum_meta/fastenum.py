@@ -94,8 +94,8 @@ class FastEnum(type):
                     fun(instance)
                 delattr(typ, f'_{name}__init_late')
 
-            typ._finalized = True
             typ.__setattr__ = typ.__delattr__ = mcs.__restrict_modification
+            typ._finalized = True
         return typ
 
     @staticmethod
@@ -137,6 +137,9 @@ class FastEnum(type):
 
     def __getitem__(cls, item):
         return getattr(cls, item)
+
+    def has_value(cls, value):
+        return value in cls._value_to_instance_map
 
     # pylint: disable=unused-argument
     # noinspection PyUnusedLocal,SpellCheckingInspection
