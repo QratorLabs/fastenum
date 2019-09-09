@@ -153,3 +153,16 @@ class HookedEnum(metaclass=FastEnum):
 # <HookedEnum.ONE: 1>
 # >>> HookedEnum.THREE.halved_value
 # <HookedEnum.ONE: 1>
+
+
+class AliasEnum(HookedEnum):
+    pass
+
+# >>> AliasEnum.ZERO.halved_value
+# <HookedEnum.ZERO: 0>
+# >>> AliasEnum.ONE.halved_value
+# <HookedEnum.ZERO: 0>
+# >>> AliasEnum.TWO.halved_value
+# <HookedEnum.ONE: 1>
+# >>> AliasEnum.THREE.halved_value
+# <HookedEnum.ONE: 1>

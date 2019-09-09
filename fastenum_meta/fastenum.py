@@ -138,6 +138,9 @@ class FastEnum(type):
     def __getitem__(cls, item):
         return getattr(cls, item)
 
+    def has_value(cls, value):
+        return value in cls._value_to_instance_map
+
     # pylint: disable=unused-argument
     # noinspection PyUnusedLocal,SpellCheckingInspection
     def __deepcopy(cls, memodict=None):
