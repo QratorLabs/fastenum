@@ -1,4 +1,3 @@
-import operator
 import pickle
 from typing import Text
 from unittest import TestCase
