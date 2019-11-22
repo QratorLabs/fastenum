@@ -5,7 +5,7 @@ with open('README.md', 'r', encoding='utf-8') as rfd:
 
 setuptools.setup(
     name='FastEnum-Meta',
-    version='1.2.3',
+    version='1.2.4',
     license='MIT',
     platforms=['any'],
     author='Andrey Semenov',
@@ -13,10 +13,10 @@ setuptools.setup(
     description='A fast pure-python implementation of Enum',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    url='https://github.com/SantjagoCorkez/fastenum',
+    url='https://github.com/QratorLabs/fastenum',
     packages=['fastenum_meta'],
     classifiers=[
-        'License :: OSI Approved :: BSD License',
+        'License :: OSI Approved :: MIT License',
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'Natural Language :: English',
