@@ -266,6 +266,6 @@ In [11]: %timeit StdEnum['ONE']
 ```
   That is:
    - 3 times faster on enum's member access
-   - ~20 times faster on enum's property (`name`, `value`) access
+   - ~8.5 times faster on enum's property (`name`, `value`) access
    - 3 times faster on enum's access by val (call on enum's class `MyEnum(value)`)
    - 1.5 times faster on enum's access by name (dict-like `MyEnum[name]`)
