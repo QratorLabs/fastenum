@@ -5,7 +5,7 @@ with open('README.md', 'r', encoding='utf-8') as rfd:
 
 setuptools.setup(
     name='FastEnum-Meta',
-    version='1.2.4',
+    version='1.2.5',
     license='MIT',
     platforms=['any'],
     author='Andrey Semenov',
