@@ -99,15 +99,26 @@ class FastEnum(type):
         return typ
 
     @staticmethod
-    def __init(slf, value: Any, name: Text):
-        slf.value = value
-        slf.name = name
+    def __init(instance, value: Any, name: Text):
+        instance.value = value
+        instance.name = name
 
     # pylint: disable=missing-docstring
     @staticmethod
     def get(typ, val=None):
         # noinspection PyProtectedMember
-        return typ._value_to_instance_map[val]
+        if not isinstance(typ._value_to_instance_map, dict):
+            for cls in typ.mro():
+                if cls is typ:
+                    continue
+                if hasattr(cls, '_value_to_instance_map') and isinstance(cls._value_to_instance_map, dict):
+                    return cls._value_to_instance_map[val]
+            raise ValueError(f'Value {val} is not found in this enum type declaration')
+        # noinspection PyProtectedMember
+        member = typ._value_to_instance_map.get(val)
+        if member is None:
+            raise ValueError(f'Value {val} is not found in this enum type declaration')
+        return member
 
     @staticmethod
     def __eq(val, other):
