@@ -1,6 +1,6 @@
 from typing import Text
 
-from fastenum_meta import FastEnum
+from fast_enum import FastEnum
 
 
 class LightEnum(metaclass=FastEnum):
