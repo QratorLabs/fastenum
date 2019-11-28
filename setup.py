@@ -4,8 +4,8 @@ with open('README.md', 'r', encoding='utf-8') as rfd:
     long_description = rfd.read()
 
 setuptools.setup(
-    name='FastEnum-Meta',
-    version='1.2.5',
+    name='fast-enum',
+    version='1.2.6',
     license='MIT',
     platforms=['any'],
     author='Andrey Semenov',
@@ -14,7 +14,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/QratorLabs/fastenum',
-    packages=['fastenum_meta'],
+    packages=['fast_enum'],
     classifiers=[
         'License :: OSI Approved :: MIT License',
         'Development Status :: 5 - Production/Stable',

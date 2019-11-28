@@ -1,4 +1,4 @@
-# fastenum
+# fast_enum
 A fast Enum implementation for Python
 
 The purpose is to replace Python3.4+ standard library Enum.

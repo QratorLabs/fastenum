@@ -2,7 +2,7 @@ import pickle
 from typing import Text
 from unittest import TestCase
 
-from fastenum_meta import FastEnum
+from fast_enum import FastEnum
 
 
 class FastEnumTestCase(TestCase):
