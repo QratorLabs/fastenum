@@ -223,6 +223,21 @@ class ExtEnumTwo(ExtEnumBase):
     RED = 'red', 'A sunset'
     GREEN = 'green', 'Allows to cross the road'
 ```
+- as requested after publication, it's possible to subclass arbitrary classes (look at tests for more) starting from 1.3:
+```python
+class IntEnum(int, metaclass=FastEnum):
+    ONE = 1
+    TWO = 2
+
+# >>> IntEnum.ONE == 1
+# True
+# >>> IntEnum.ONE * 100
+# 100
+
+import sys
+sys.exit(IntEnum.TWO)  # sets python's interpreter exit code to 2
+```
+
 - faster than standard library's one
 ```
 In [2]: %timeit ValuesGivenEnum.FOUR
