@@ -13,7 +13,8 @@ A fast(er) Enum implementation with a set of features not provided by stdlib's E
  enum values (at that point the context has all the values created and initialized, additional
  properties that depend on other enum values could be calculated and set up)
 """
-from typing import Any, Text, Dict, List, Tuple, Type, Optional, Callable
+from functools import partial
+from typing import Any, Text, Dict, List, Tuple, Type, Optional, Callable, Iterable
 
 
 # pylint: disable=inconsistent-return-statements
@@ -23,6 +24,19 @@ def _resolve_init(bases: Tuple[Type]) -> Optional[Callable]:
             resolved_init = getattr(rcls, '__init__')
             if resolved_init and resolved_init is not object.__init__:
                 return resolved_init
+
+
+def _resolve_new(bases: Tuple[Type]) -> Optional[Tuple[Callable, Type]]:
+    for bcls in bases:
+        new = getattr(bcls, '__new__', None)
+        if new not in {
+            None,
+            None.__new__,
+            object.__new__,
+            FastEnum.__new__,
+            getattr(FastEnum, '_FastEnum__new')
+        }:
+            return new, bcls
 
 
 class FastEnum(type):
@@ -51,9 +65,19 @@ class FastEnum(type):
                 namespace[attr] = light_val
                 light_val += 1
 
-        __slots__ = set(namespace.get('__slots__', tuple())) | {'name', 'value',
-                                                                '_value_to_instance_map'}
-        namespace['__slots__'] = tuple(__slots__)
+        __itemsize__ = 0
+        for bcls in bases:
+            if bcls is type:
+                continue
+            __itemsize__ = max(__itemsize__, bcls.__itemsize__)
+
+        if not __itemsize__:
+            __slots__ = set(namespace.get('__slots__', tuple())) | {'name', 'value',
+                                                                    '_value_to_instance_map',
+                                                                    '_base_typed'}
+            namespace['__slots__'] = tuple(__slots__)
+        namespace['__new__'] = FastEnum.__new
+
         if '__init__' not in namespace:
             namespace['__init__'] = _resolve_init(bases) or mcs.__init
         if '__annotations__' not in namespace:
@@ -61,6 +85,7 @@ class FastEnum(type):
             for k in attributes:
                 __annotations__[k] = name
             namespace['__annotations__'] = __annotations__
+        namespace['__dir__'] = partial(FastEnum.__dir, bases=bases, namespace=namespace)
         typ = type.__new__(mcs, name, bases, namespace)
         if attributes:
             typ._value_to_instance_map = {}
@@ -99,7 +124,21 @@ class FastEnum(type):
         return typ
 
     @staticmethod
+    def __new(cls, *values, **_):
+        __new__ = _resolve_new(cls.__bases__)
+        if __new__:
+            __new__, typ = __new__
+            obj = __new__(cls, *values)
+            obj._base_typed = typ
+            return obj
+
+        return object.__new__(cls)
+
+    @staticmethod
     def __init(instance, value: Any, name: Text):
+        base_val_type = getattr(instance, '_base_typed', None)
+        if base_val_type:
+            value = base_val_type(value)
         instance.value = value
         instance.name = name
 
@@ -122,7 +161,7 @@ class FastEnum(type):
 
     @staticmethod
     def __eq(val, other):
-        return isinstance(other, type(val)) and val is other
+        return isinstance(val, type(other)) and (val is other if type(other) is type(val) else val.value == other)
 
     def __hash(cls):
         # noinspection PyUnresolvedReferences
@@ -171,4 +210,15 @@ class FastEnum(type):
 
     @staticmethod
     def __repr(clz):
-        return f'<{clz.__class__.__name__}.{clz.name}: {clz.value}>'
+        return f'<{clz.__class__.__name__}.{clz.name}: {repr(clz.value)}>'
+
+    def __dir__(self) -> Iterable[str]:
+        return [k for k in super().__dir__() if k not in ('_finalized', '_value_to_instance_map')]
+
+    @staticmethod
+    def __dir(bases, namespace, *_, **__):
+        keys = [k for k in namespace.keys() if k in ('__annotations__', '__module__', '__qualname__')
+                or not k.startswith('_')]
+        for bcls in bases:
+            keys.extend(dir(bcls))
+        return list(set(keys))
