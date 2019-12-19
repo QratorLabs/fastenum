@@ -5,7 +5,7 @@ with open('README.md', 'r', encoding='utf-8') as rfd:
 
 setuptools.setup(
     name='fast-enum',
-    version='1.2.6',
+    version='1.3.0',
     license='MIT',
     platforms=['any'],
     author='Andrey Semenov',

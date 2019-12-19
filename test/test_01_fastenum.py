@@ -155,3 +155,28 @@ class FastEnumTestCase(TestCase):
             setattr(RestrictEnum.ONE, 'value', 5)
         with self.assertRaises(TypeError):
             delattr(RestrictEnum.TWO, 'name')
+
+    def test_08_base_types(self):
+        class IntEnum(int, metaclass=FastEnum):
+            ZERO: 'IntEnum' = 0
+            ONE: 'IntEnum'
+            TWO: 'IntEnum'
+
+        self.assertEqual(IntEnum.ZERO, 0)
+
+        class StrEnum(str, metaclass=FastEnum):
+            _ZERO_VALUED = True
+
+            STR_ZERO: 'StrEnum'
+            STR_ONE: 'StrEnum'
+
+        self.assertEqual(StrEnum.STR_ZERO, '0')
+        self.assertEqual('0', StrEnum.STR_ZERO)
+        self.assertEqual(StrEnum.STR_ONE, '1')
+        self.assertEqual('1', StrEnum.STR_ONE)
+
+        class FloatEnum(float, metaclass=FastEnum):
+            ONE: 'FloatEnum'
+            TWO: 'FloatEnum'
+
+        self.assertEqual(str(FloatEnum.TWO * 10), '20.0')
