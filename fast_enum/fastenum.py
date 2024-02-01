@@ -87,7 +87,7 @@ class FastEnum(type):
         namespace['__dir__'] = partial(FastEnum.__dir, bases=bases, namespace=namespace)
         typ = type.__new__(mcs, name, bases, namespace)
         if attributes:
-            typ._value_to_instance_map = {}
+            typ.__members__=typ._value_to_instance_map = {}
             for instance_name in attributes:
                 val = namespace[instance_name]
                 if not isinstance(val, tuple):
