@@ -53,7 +53,7 @@ class FastEnum(type):
     # pylint: disable=bad-mcs-classmethod-argument,protected-access,too-many-locals
     # pylint: disable=too-many-branches
     def __new__(mcs, name, bases, namespace: Dict[Text, Any]):
-        slots=set(namespace["__slots__"])
+        slots=set(namespace.get("__slots__",{}))
         attributes: List[Text] = [k for k,v in namespace.items()
                                   if (not k.startswith('_') and k not in slots and not callable(v))]
         light_val = 0 + int(not bool(namespace.get('_ZERO_VALUED')))
