@@ -185,7 +185,9 @@ class FastEnum(type):
         super().__delattr__(item)
 
     def __getitem__(cls, item):
-        return getattr(cls, item)
+        if hasattr(cls,'__missing__') and hasattr(cls,item):
+            return getattr(cls, item)
+        return cls.__missing__(item)
 
     def has_value(cls, value):
         return value in cls._value_to_instance_map
