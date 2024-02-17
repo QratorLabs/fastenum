@@ -4,8 +4,8 @@ with open('README.md', 'r', encoding='utf-8') as rfd:
     long_description = rfd.read()
 
 setuptools.setup(
-    name='fast-enum',
-    version='1.3.0',
+    name='fastenumplus',
+    version='1.4.0',
     license='MIT',
     platforms=['any'],
     author='Andrey Semenov',
@@ -13,7 +13,7 @@ setuptools.setup(
     description='A fast pure-python implementation of Enum',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    url='https://github.com/QratorLabs/fastenum',
+    url='https://github.com/hiddify/fastenum',
     packages=['fast_enum'],
     classifiers=[
         'License :: OSI Approved :: MIT License',

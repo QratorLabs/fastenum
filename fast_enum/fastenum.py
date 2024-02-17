@@ -53,10 +53,9 @@ class FastEnum(type):
     # pylint: disable=bad-mcs-classmethod-argument,protected-access,too-many-locals
     # pylint: disable=too-many-branches
     def __new__(mcs, name, bases, namespace: Dict[Text, Any]):
-        attributes: List[Text] = [k for k in namespace.keys()
-                                  if (not k.startswith('_') and k.isupper())]
-        attributes += [k for k, v in namespace.get('__annotations__', {}).items()
-                       if (not k.startswith('_') and k.isupper() and v == name)]
+        slots=set(namespace.get("__slots__",{}))
+        attributes: List[Text] = [k for k,v in namespace.items()
+                                  if (not k.startswith('_') and k not in slots and not callable(v))]
         light_val = 0 + int(not bool(namespace.get('_ZERO_VALUED')))
         for attr in attributes:
             if attr in namespace:
@@ -88,7 +87,7 @@ class FastEnum(type):
         namespace['__dir__'] = partial(FastEnum.__dir, bases=bases, namespace=namespace)
         typ = type.__new__(mcs, name, bases, namespace)
         if attributes:
-            typ._value_to_instance_map = {}
+            typ.__members__=typ._value_to_instance_map = {}
             for instance_name in attributes:
                 val = namespace[instance_name]
                 if not isinstance(val, tuple):
@@ -186,7 +185,9 @@ class FastEnum(type):
         super().__delattr__(item)
 
     def __getitem__(cls, item):
-        return getattr(cls, item)
+        if hasattr(cls,'__missing__') and hasattr(cls,item):
+            return getattr(cls, item)
+        return cls.__missing__(item)
 
     def has_value(cls, value):
         return value in cls._value_to_instance_map
